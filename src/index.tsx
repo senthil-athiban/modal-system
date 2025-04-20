@@ -1,6 +1,13 @@
 import { create } from "zustand";
 
 type ModalInstanceState = "NEW" | "CLOSED" | "MOUNTED";
+export type ModalSize = 'xs' | 'sm' | 'md' | 'lg';
+
+interface ModalProps {
+    size?: ModalSize;
+    close?: () => void;
+    [key: string]: unknown;
+  }
 
 interface ModalRegistration {
     name: string;
@@ -15,7 +22,7 @@ interface ModalInstance {
     modalName: string;
     onClose: () => void;
     container?: HTMLElement;
-    props: Record<string, any>;
+    props: ModalProps;
     component: React.ComponentType<any>;
     state: ModalInstanceState;
 }
@@ -41,6 +48,12 @@ const useModal = () => {
     const modalState = getModalState();
     
     const modalRegistry = getModalRegistry();
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+        if (event.key === "Escape") {
+            closeTopModal();
+        }
+    }
 
     const closeTopModal = () => {
         const topModal = modalState.modalStack[modalState.modalStack.length - 1];
@@ -107,7 +120,8 @@ const useModal = () => {
         closeInstance,
         openInstance,
         showModal,
-        setupModals
+        setupModals,
+        handleEscapeKey
     }
 }
 
