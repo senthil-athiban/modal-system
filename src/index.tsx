@@ -1,7 +1,9 @@
+import { useCallback } from "react";
 import { create } from "zustand";
+import { ModalError, validatModalRegistration } from "./error-handler";
 
 type ModalInstanceState = "NEW" | "CLOSED" | "MOUNTED";
-export type ModalSize = 'xs' | 'sm' | 'md' | 'lg';
+type ModalSize = 'xs' | 'sm' | 'md' | 'lg';
 
 interface ModalProps {
     size?: ModalSize;
@@ -32,6 +34,16 @@ interface ModalState {
     modalStack: Array<ModalInstance>;
 }
 
+interface ModalProviderProps {
+    children: React.ReactNode;
+    /**
+     * Optional z-index starting point for modals
+     * @default 1000
+     */
+    baseZIndex?: number;
+    className?: string;
+  }
+
 const modalStateStore = create<ModalState>(() => ({
     modalContainer: null,
     modalStack: [],
@@ -41,13 +53,14 @@ const modalRegistryStore = create<ModalRegistry>(() => ({
     modals: {},
 }));
 
+
 const getModalState = () => modalStateStore.getState();
 const getModalRegistry = () => modalRegistryStore.getState();
 
-const useModal = () => {
-    const modalState = getModalState();
-    
-    const modalRegistry = getModalRegistry();
+const useModalManager = () => {
+    const modalState = modalStateStore((state) => state);
+    const modalRegistry = modalRegistryStore((state) => state);
+
 
     const handleEscapeKey = (event: KeyboardEvent) => {
         if (event.key === "Escape") {
@@ -63,6 +76,9 @@ const useModal = () => {
     }
 
     const closeInstance = (instance: ModalInstance) => {
+        if (!instance) {
+            throw new ModalError('Cannot close undefined modal instance');
+        }
         modalStateStore.setState((state) => ({
             ...state,
             modalStack: state.modalStack.map((i) => i === instance ? {...i, state: 'CLOSED'} : i),
@@ -84,14 +100,12 @@ const useModal = () => {
     }
 
     const showModal = (name: string, props: Record<string, any> = {}, onClose: () => void = () => {}) => {
-
         const modal = modalRegistry.modals[name];
         if(!modal) {
-            console.error(`Modal ${name} not found in registry`);
-            return;
+            throw new ModalError(`Modal "${name}" not found in registry`);
         }
 
-        const closeInstance = () => {
+        const close = () => {
             const modal = modalState.modalStack.find((i) => i.modalName === name);
             if(modal) {
                 modalStateStore.setState((state) => ({
@@ -108,10 +122,12 @@ const useModal = () => {
             onClose,
             props: {
                 ...props,
-                close: closeInstance,
+                close: close,
             },
             component: modal.component,
-        })
+        });
+
+        return close;
     }
 
 
@@ -125,4 +141,84 @@ const useModal = () => {
     }
 }
 
-export { modalStateStore, modalRegistryStore, useModal };
+function useRegisterModal() {
+    const setModalRegistry = modalRegistryStore.setState;
+    
+    return (modalRegistration: ModalRegistration) => {
+        try {
+            validatModalRegistration(modalRegistration);
+            setModalRegistry((state) => ({
+                modals: {
+                    ...state.modals,
+                    [modalRegistration.name]: modalRegistration
+                }
+            }))
+        } catch (error) {
+            console.log('error:', error);
+            if(error instanceof ModalError) {
+                console.error(error.message);
+            }
+            throw error;
+        }
+        
+    }
+}
+
+function useGetRegisteredModal() {
+    const modalRegistry = modalRegistryStore((state) => state);
+
+    return (modalName: string) => {
+        const modal = modalRegistry.modals[modalName];
+        if(!modal) {
+            throw new ModalError(`Modal "${modalName}" not found in registry`);
+        }
+
+        return modal;
+    };
+}
+
+function useModal() {
+    const modalState = modalStateStore((state) => state);
+    
+    const closeAll = useCallback(() => {
+        modalState.modalStack.forEach(instance => {
+            instance.onClose();
+        });
+    }, [modalState.modalStack]);
+    
+    const closeAllExcept = useCallback((modalName: string) => {
+        modalState.modalStack.forEach(instance => {
+            if (instance.modalName !== modalName) {
+                instance.onClose();
+            }
+        });
+    }, [modalState.modalStack]);
+
+    const isModalOpen = useCallback((modalName: string): boolean => {
+        return modalState.modalStack.some(m => m.modalName === modalName);
+    }, [modalState.modalStack]);
+
+    const getActiveModals = useCallback((): string[] => {
+        return modalState.modalStack.map(m => m.modalName);
+    }, [modalState.modalStack]);
+
+    return {
+        closeAll,
+        closeAllExcept,
+        isModalOpen,
+        getActiveModals,
+        modalStack: modalState.modalStack
+    } as const;
+}
+
+export { modalStateStore, modalRegistryStore, useModal, useModalManager, getModalRegistry, getModalState, useRegisterModal, useGetRegisteredModal };
+export type {
+    ModalInstanceState,
+    ModalSize,
+    ModalProps,
+    ModalRegistration,
+    ModalRegistry,
+    ModalInstance,
+    ModalState,
+    ModalProviderProps
+};
