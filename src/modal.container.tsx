@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { modalStateStore, useModalManager, ModalInstance, ModalProviderProps } from '.';
 import { createPortal } from 'react-dom';
 

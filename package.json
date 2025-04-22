@@ -1,7 +1,16 @@
 {
-  "name": "modal-system",
-  "private": true,
-  "version": "0.0.0",
+  "name": "react-modal-system",
+  "description": "A flexible modal management system for React applications",
+  "private": false,
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,11 +18,12 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
-  "dependencies": {
+  "peerDependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "zustand": "^5.0.3"
   },
+  "dependencies": {},
   "devDependencies": {
     "@eslint/js": "^9.22.0",
     "@types/react": "^19.0.10",
@@ -26,5 +36,21 @@
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.26.1",
     "vite": "^6.3.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/senthil-athiban/modal-system.git"
+  },
+  "keywords": [
+    "modal"
+  ],
+  "author": "Senthil Athiban",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/senthil-athiban/modal-system/issues"
+  },
+  "homepage": "https://github.com/senthil-athiban/modal-system#readme",
+  "publishConfig": {
+    "access": "public"
   }
 }
