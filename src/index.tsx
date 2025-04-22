@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import { create } from "zustand";
 import { ModalError, validatModalRegistration } from "./error-handler";
 
@@ -154,7 +154,6 @@ function useRegisterModal() {
                 }
             }))
         } catch (error) {
-            console.log('error:', error);
             if(error instanceof ModalError) {
                 console.error(error.message);
             }

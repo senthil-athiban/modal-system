@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useGetRegisteredModal, useModal, useModalManager, useRegisterModal } from '.';
+import { useModal, useModalManager, useRegisterModal } from '.';
 import { Modal, ModalHeader, ModalTitle, ModalContent, ModalFooter } from './components/modal.component';
 
 interface ModalProps {

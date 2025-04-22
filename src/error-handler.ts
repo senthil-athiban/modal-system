@@ -14,7 +14,6 @@ export function validatModalRegistration (registration: ModalRegistration) {
     if (!registration.component) {
         throw new ModalError('Modal component is required');
     }
-    console.log('typeof registration.component:', typeof registration.component)
     if (typeof registration.component !== 'function') {
         throw new ModalError('Modal component must be a function');
     }
