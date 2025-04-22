@@ -1,4 +1,4 @@
-import { ModalRegistration } from ".";
+import { ModalRegistration } from "./types/modal";
 
 export class ModalError extends Error {
     constructor(message: string) {
