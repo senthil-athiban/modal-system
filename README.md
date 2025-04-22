@@ -6,8 +6,6 @@ A flexible modal management system for React applications.
 
 ```bash
 npm install react-modal-system
-# or
-yarn add react-modal-system
 ```
 
 ## Basic Usage
@@ -224,9 +222,8 @@ export function App() {
 }
 ```
 
-## Best practices
+## 💡 Best practices
 
-💡 Best Practices
 ✅ Use registerModal() during initial app load
 To ensure all your modals are known and safely accessible via showModal, register them once when your app initializes:
 ```tsx
@@ -246,6 +243,21 @@ This enables:
 - 🧪 Type safety and auto-complete (if typed keys are used)
 - 🚫 Avoids runtime errors (no "modal not found" surprises)
 
+## ❌ Avoid registering modals inline on each usage
+
+```tsx
+// ❌ Avoid this
+const handleOpen = () => {
+  registerModal({ name: 'my-modal', component: MyModal });
+  showModal('my-modal');
+};
+```
+This can lead to:
+
+- 🔁 Unnecessary re-registrations
+- ❌ Duplicate registrations with different components
+- 🤯 Hard-to-debug modal behaviors
+
 ## Features
 
 - 🚀 Easy modal registration and management
@@ -257,7 +269,23 @@ This enables:
 - 🔍 Modal state tracking
 - 📱 Responsive design
 
-## API Reference
+## API Documentation
+
+### useModal Hook
+
+The `useModal` hook provides the following methods:
+
+| Method | Description | Parameters | Return Type | Example |
+|--------|-------------|------------|-------------|---------|
+| `showModal` | Opens a modal with specified props and action | <ul><li>`name: string`</li><li>`props?: Record<string, any>`</li><li>`action?: ModalAction`</li><li>`onClose?: () => void`</li></ul> | `() => void` | ```showModal('user-modal', { userId: '123' }, 'CREATE') ``` |
+| `closeTopModal` | Closes the most recently opened modal | None | `void` | ```closeTopModal() ``` |
+| `closeInstance` | Closes a specific modal instance | `instance: ModalInstance` | `void` | ```closeInstance(modalInstance) ``` |
+| `openInstance` | Opens a new modal instance | `instance: ModalInstance` | `void` | ```openInstance({ name: 'modal', component: Modal }) ``` |
+| `setupModals` | Initializes the modal container | `modalContainer: HTMLElement \| null` | `void` | ```setupModals(document.getElementById('modal-root')) ``` |
+| `closeAll` | Closes all open modals | None | `void` | ```const { closeAll } = useModal(); closeAll(); ``` |
+| `closeAllExcept` | Closes all modals except the specified one | `modalName: string` | `void` | ```closeAllExcept('form-modal'); ``` |
+| `isModalOpen` | Checks if a specific modal is open | `modalName: string` | `boolean` | ```const isOpen = isModalOpen('user-modal'); ``` |
+| `getActiveModals` | Returns array of all active modal instances | None | `ModalInstance[]` | ```const activeModals = getActiveModals(); ``` |
 
 ### Modal Actions
 The system supports different modal actions:
@@ -272,5 +300,3 @@ The system supports different modal actions:
 ```tsx
 showModal('modal-name', props, 'ALERT');
 ```
-
-For complete API documentation and more examples, visit our [GitHub repository](https://github.com/senthil-athiban/modal-system).

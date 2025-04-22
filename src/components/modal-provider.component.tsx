@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { ModalInstance, ModalProviderProps } from '../types/modal';
-import { useModalManager } from '../hooks';
 import { modalStateStore } from '../store/modal.store';
+import useModal from '../hooks/useModal';
 
 const original = window.getComputedStyle(document.body).overflow;
 
@@ -12,7 +12,7 @@ const ModalProvider = ({
     className = '' 
   }: ModalProviderProps) => {
     const modalRootRef = useRef<HTMLDivElement | null>(null);
-    const { setupModals, handleEscapeKey } = useModalManager();
+    const { setupModals, handleEscapeKey } = useModal();
     const { modalStack } = modalStateStore((state) => state);
     const setModals = modalStateStore.setState;
 
