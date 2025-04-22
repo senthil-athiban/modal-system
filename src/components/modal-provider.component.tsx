@@ -41,7 +41,8 @@ const ModalProvider = ({
             {modalRootRef.current && createPortal(
                 <>
                     {modalStack.map((instance: ModalInstance, index: number) => {
-                        const { component: ModalComponent, modalName, props, state } = instance;
+                        
+                        const { component: ModalComponent, name: modalName, props, state } = instance;
 
                         if (state === 'CLOSED') {
                             setTimeout(() => {

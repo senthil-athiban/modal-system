@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { modalStateStore } from "../store/modal.store";
+import { ModalInstance } from "types/modal";
 
 const useModal = () => {
     const modalState = modalStateStore((state) => state);
@@ -12,18 +13,18 @@ const useModal = () => {
     
     const closeAllExcept = useCallback((modalName: string) => {
         modalState.modalStack.forEach(instance => {
-            if (instance.modalName !== modalName) {
+            if (instance.name !== modalName) {
                 instance.onClose();
             }
         });
     }, [modalState.modalStack]);
 
     const isModalOpen = useCallback((modalName: string): boolean => {
-        return modalState.modalStack.some(m => m.modalName === modalName);
+        return modalState.modalStack.some(m => m.name === modalName);
     }, [modalState.modalStack]);
 
-    const getActiveModals = useCallback((): string[] => {
-        return modalState.modalStack.map(m => m.modalName);
+    const getActiveModals = useCallback((): ModalInstance[] => {
+        return modalState.modalStack;
     }, [modalState.modalStack]);
 
     return {

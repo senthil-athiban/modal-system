@@ -1,6 +1,6 @@
 import { ModalError } from "../error-handler";
 import { modalRegistryStore, modalStateStore } from "../store/modal.store";
-import type { ModalInstance } from "../types/modal";
+import type { ModalAction, ModalInstance } from "../types/modal";
 
 const useModalManager = () => {
     const modalState = modalStateStore((state) => state);
@@ -44,14 +44,14 @@ const useModalManager = () => {
         }))
     }
 
-    const showModal = (name: string, props: Record<string, any> = {}, onClose: () => void = () => {}) => {
+    const showModal = (name: string, props: Record<string, any> = {}, action?: ModalAction, onClose: () => void = () => {}) => {
         const modal = modalRegistry.modals[name];
         if(!modal) {
             throw new ModalError(`Modal "${name}" not found in registry`);
         }
 
         const close = () => {
-            const modal = modalState.modalStack.find((i) => i.modalName === name);
+            const modal = modalState.modalStack.find((i) => i.name === name);
             if(modal) {
                 modalStateStore.setState((state) => ({
                     ...state,
@@ -63,13 +63,14 @@ const useModalManager = () => {
 
         openInstance({
             state: 'NEW',
-            modalName: name,
+            name: name,
             onClose,
             props: {
                 ...props,
                 close: close,
             },
             component: modal.component,
+            ...(action !== undefined ? { action } : {}),
         });
 
         return close;

@@ -12,17 +12,20 @@ export interface ModalRegistration {
     component: React.ComponentType<any>;
 }
 
+export type ModalAction = "CREATE" | "READ" | "UPDATE" | "DELETE" | "CONFIRM" | "ALERT" | "FORM"
+
 export interface ModalRegistry {
     modals: Record<string, ModalRegistration>;
 }
 
 export interface ModalInstance {
-    modalName: string;
+    name: string;
     onClose: () => void;
     container?: HTMLElement;
     props: ModalProps;
     component: React.ComponentType<any>;
     state: ModalInstanceState;
+    action?: ModalAction;
 }
 
 export interface ModalState {
